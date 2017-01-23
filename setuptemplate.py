@@ -22,6 +22,7 @@ MOD_LIST = [
 
 # List of file that need to be copied/replaced.  List is comprised of tuples containing the filename
 # and location.  For example ('file.txt', '/home/pi/')
+# NOTE: If file is listed here, it should be included in the repository
 COPY_LIST = [
     ('autostart.sh', '/opt/retropie/configs/all/'),
 

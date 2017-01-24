@@ -1,4 +1,14 @@
 #!/usr/bin/env python
+"""
+Simply setup script to automate the process of setting up a retropie with various electronics kits.
+
+Copyright (C) 2017 Kenneth A Jones II kenneth@nvnctechnology.com
+
+This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License 
+as published by the Free Software Foundation; either version 3 of the License, or (at your option) any later version.
+
+Visit: https://www.facebook.com/groups/miniNESbuilders/
+"""
 
 import os
 import sys

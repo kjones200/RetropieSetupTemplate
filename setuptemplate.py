@@ -62,6 +62,10 @@ def main():
     
     run_process(['git', 'clone https://github.com/%s/%s.git' % (REPO_USERNAME, REPO_NAME)])
     os.chdir(REPO_NAME) # move into repo directory
+    
+    # Modify retroarch.cfg
+    
+    # Modify config.txt
 
 
 def run_process(cmd):
@@ -77,6 +81,9 @@ def run_process(cmd):
     if p.returncode != 0:
         logging.error(err)
     return p.returncode
+
+def find_modifiy(filename, search, mod):
+    
 
 
 if __name__ == '__main__':

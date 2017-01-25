@@ -52,10 +52,14 @@ MOD_LIST = [
 # and location.  For example {'file.txt': '/home/pi/'}
 # NOTE: If file is listed here, it should be included in the repository
 COPY_LIST = [
-    {'autostart.sh': '/opt/retropie/configs/all/'},
-    {'runcommand-onstart.sh': '/opt/retropie/configs/all/'},
-    {'runcommand-onend.sh': '/opt/retropie/configs/all/'},
-    {'script.py': '/Users/kenneth/projects/RetropieSetupTemplate/root/home/pi/NESPi'},
+    {'name'    : 'autostart.sh',
+     'location': '/Users/kenneth/projects/RetropieSetupTemplate/root/opt/retropie/configs/all/'},
+    {'name'    : 'runcommand-onstart.sh',
+     'location': '/Users/kenneth/projects/RetropieSetupTemplate/root/opt/retropie/configs/all/'},
+    {'name'    : 'runcommand-onend.sh',
+     'location': '/Users/kenneth/projects/RetropieSetupTemplate/root/opt/retropie/configs/all/'},
+    {'name'    : 'script.py',
+     'location': '/Users/kenneth/projects/RetropieSetupTemplate/root/home/pi/NESPi'},
 ]
 
 
@@ -84,9 +88,15 @@ def main():
     run_process(['git', 'clone https://github.com/%s/%s.git' % (REPO_USERNAME, REPO_NAME)])
     os.chdir(REPO_NAME)  # move into repo directory
     
-    # Perform modifications to files defined in
+    # Perform modifications to files defined in MOD_LIST
     for f in MOD_LIST:
+        print 'Modifying ' + f['name'] + ' ...'
         mod_file(f)
+    
+    # Perform modifications to files defined in COPY_LIST
+    for f in COPY_LIST:
+        print 'Copying ' + f['name'] + ' ...'
+        copy_files(f)
 
 
 def run_process(cmd):
@@ -105,7 +115,20 @@ def run_process(cmd):
 
 
 def copy_files(file):
-    pass
+    dest_path = os.path.join(file['location'], file['name'])
+    try:
+        # Check if destination directory exist
+        if not os.path.exists(file['location']):
+            logging.warning("'%s' does not exit, creating ..." % file['location'])
+            os.mkdir(file['location'])
+        elif os.path.exists(dest_path):  # Check if file exists
+            logging.warning('File already exist, backing it up ...')
+            os.rename(dest_path, dest_path + '.bak')
+        shutil.copyfile(file['name'], dest_path)
+    
+    except:
+        logging.error("Failed to copy {0} to '{1}".format(file['name'], file['location']))
+        sys.exit(1)
 
 
 def mod_file(file):

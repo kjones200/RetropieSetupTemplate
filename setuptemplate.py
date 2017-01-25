@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+
 """
 Simply setup script to automate the process of setting up a retropie with various electronics kits.
 
@@ -32,12 +33,17 @@ WORKING_DIR = '/Users/kenneth/projects/RetropieSetupTemplate/root/home/pi/'
 REPO_USERNAME = "kjones200"
 REPO_NAME = "testrepo"
 
-# List of files requiring modification.  List is comprised of dictionary containing the filename
+# List of files requiring modifications.  List is comprised of dictionary containing the filename
 # location, search tet, and the modification to apply.  For example ('file.txt', '/home/pi/')
 MOD_LIST = [
     {'name'    : 'config.txt',
      'location': '/Users/kenneth/projects/RetropieSetupTemplate/root/boot',
-     'mods'    : {'enable_uart=0': 'enable_uart=1'}
+     'mods'    : {'enable_uart': 'enable_uart=1'}
+     },
+    {'name'    : 'retroarch.cfg',
+     'location': '/Users/kenneth/projects/RetropieSetupTemplate/root/opt/retropie/configs/all',
+     'mods'    : {'network_cmd_enable': 'network_cmd_enable = true',
+                  'network_cmd_port'  : 'network_cmd_port = 55355'}
      },
 
 ]
@@ -97,8 +103,10 @@ def run_process(cmd):
         logging.error(err)
     return p.returncode
 
+
 def copy_files(file):
     pass
+
 
 def mod_file(file):
     src_path = os.path.join(file['location'], file['name'])
@@ -116,7 +124,7 @@ def mod_file(file):
             for line in in_file:
                 for target, replacement in file['mods'].iteritems():
                     if target in line:
-                        line = line.replace(target, replacement).replace('#', '')
+                        line = replacement + '\n'
                 out_file.write(line)
         
         # Backup old source file by adding .bak extension, then rename temp file with source files name

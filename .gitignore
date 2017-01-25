@@ -1,0 +1,7 @@
+*.DS_Store
+root/*.DS_Store
+root/opt/*.DS_Store
+root/opt/retropie/*.DS_Store
+root/opt/retropie/configs/*.DS_Store
+install.log
+root/home/pi/testrepo

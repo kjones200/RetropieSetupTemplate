@@ -35,16 +35,21 @@ REPO_NAME = "testrepo"
 # List of files requiring modification.  List is comprised of dictionary containing the filename
 # location, search tet, and the modification to apply.  For example ('file.txt', '/home/pi/')
 MOD_LIST = [
-    {'filename': 'config.txt', 'location': '/boot/', 'search': 'enable_uart=0', 'modification': 'enable_uart=1'},
+    {'name'    : 'config.txt',
+     'location': '/Users/kenneth/projects/RetropieSetupTemplate/root/boot',
+     'mods'    : {'enable_uart=0': 'enable_uart=1'}
+     },
 
 ]
 
-# List of file that need to be copied/replaced.  List is comprised of tuples containing the filename
-# and location.  For example ('file.txt', '/home/pi/')
+# List of files that need to be copied/replaced.  List is comprised of dictionary containing the filename
+# and location.  For example {'file.txt': '/home/pi/'}
 # NOTE: If file is listed here, it should be included in the repository
 COPY_LIST = [
-    ('autostart.sh', '/opt/retropie/configs/all/'),
-
+    {'autostart.sh': '/opt/retropie/configs/all/'},
+    {'runcommand-onstart.sh': '/opt/retropie/configs/all/'},
+    {'runcommand-onend.sh': '/opt/retropie/configs/all/'},
+    {'script.py': '/Users/kenneth/projects/RetropieSetupTemplate/root/home/pi/NESPi'},
 ]
 
 
@@ -63,7 +68,7 @@ def main():
     # Downloads necessary python modules dependencies.  Use 'yes' for installation without prompts.
     # code = run_process(['yes |', 'pip install psutil pyserial'])
     # if code != 0:
-    #    exit(code)
+    #    sys.exit(code)
     
     # Download the repository
     # Check for repo and delete it to prevent errors when downloading due to repo already existing
@@ -71,11 +76,11 @@ def main():
         shutil.rmtree(os.path.join(os.getcwd(), REPO_NAME), ignore_errors=True)
     
     run_process(['git', 'clone https://github.com/%s/%s.git' % (REPO_USERNAME, REPO_NAME)])
-    os.chdir(REPO_NAME) # move into repo directory
+    os.chdir(REPO_NAME)  # move into repo directory
     
-    # Modify retroarch.cfg
-    
-    # Modify config.txt
+    # Perform modifications to files defined in
+    for f in MOD_LIST:
+        mod_file(f)
 
 
 def run_process(cmd):
@@ -92,8 +97,35 @@ def run_process(cmd):
         logging.error(err)
     return p.returncode
 
-def find_modifiy(filename, search, mod):
+def copy_files(file):
+    pass
+
+def mod_file(file):
+    src_path = os.path.join(file['location'], file['name'])
+    dest_path = os.path.join(file['location'], 'temp_' + file['name'])
     
+    try:
+        # Check if file exists
+        if not os.path.exists(src_path):
+            logging.warning('File does not exist, nothing to modify')
+            return  # File doesn't exist, nothing to modify
+        
+        # Write the contents of source file to a temporary file, while making modifications.  This done so that the
+        # source file doesn't have to be read nto memory
+        with open(src_path, 'r') as in_file, open(dest_path, 'w') as out_file:
+            for line in in_file:
+                for target, replacement in file['mods'].iteritems():
+                    if target in line:
+                        line = line.replace(target, replacement).replace('#', '')
+                out_file.write(line)
+        
+        # Backup old source file by adding .bak extension, then rename temp file with source files name
+        os.rename(src_path, src_path + '.bak')
+        os.rename(dest_path, src_path)
+    
+    except:
+        logging.error('Modifing file ' + src_path + ' failed')
+        sys.exit(1)
 
 
 if __name__ == '__main__':
